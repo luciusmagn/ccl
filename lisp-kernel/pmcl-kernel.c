@@ -1256,10 +1256,23 @@ parse_numeric_option(char *arg, char *argname, natural default_val)
 */
 Boolean copy_exception_avx_state = false;
 
+static Boolean
+cclsh_uses_prefix_options(const char *name)
+{
+  const char *base = strrchr(name, '/');
+
+  base = base ? base + 1 : name;
+  if (*base == '-') {
+    base++;
+  }
+  return strcmp(base, "cclsh") == 0;
+}
+
 void
 process_options(int argc, char *argv[], wchar_t *shadow[])
 {
   int i, j, k, num_elide, flag, arg_error;
+  Boolean prefix_options = cclsh_uses_prefix_options(argv[0]);
   char *arg, *val;
   wchar_t *warg, *wval;
 #ifdef DARWIN
@@ -1273,7 +1286,11 @@ process_options(int argc, char *argv[], wchar_t *shadow[])
     }
     arg_error = 0;
     if (*arg != '-') {
-      i++;
+      if (prefix_options) {
+        break;
+      } else {
+        i++;
+      }
     } else {
       num_elide = 0;
       val = NULL;
@@ -1410,7 +1427,11 @@ process_options(int argc, char *argv[], wchar_t *shadow[])
                      
         break;
       } else {
-	i++;
+	if (prefix_options) {
+	  break;
+	} else {
+	  i++;
+	}
       }
       if (arg_error) {
 	usage_exit("error in program arguments", 1, "");
