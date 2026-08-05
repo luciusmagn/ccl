@@ -541,6 +541,7 @@ given is that of a group to which the current user belongs."
                                    #+android-target (1+ #$__NEW_UTS_LEN)
 				   #+darwin-target #$_SYS_NAMELEN
                                    #+(or freebsd-target solaris-target) #$SYS_NMLN
+                                   #+netbsd-target #$_SYS_NMLN
                                    idx)))
     "unknown"))
 
@@ -599,6 +600,11 @@ given is that of a group to which the current user belongs."
 (defun %uname (idx)
   (%stack-block ((buf (* #$SYS_NMLN 5)))
     (%uts-string (#___xuname #$SYS_NMLN buf) idx buf)))
+
+#+netbsd-target
+(defun %uname (idx)
+  (%stack-block ((buf (* #$_SYS_NMLN 5)))
+    (%uts-string (#_uname buf) idx buf)))
 
 #+solaris-target
 (defun %uname (idx)
