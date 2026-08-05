@@ -1,6 +1,7 @@
 ;;;-*-Mode: LISP; Package: CCL -*-
 ;;;
 ;;; Copyright 1994-2001 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -3418,10 +3419,12 @@
       (scale-buffer-size octets))))
 
 (defun milliseconds-until-deadline (deadline ioblock)
-  (let* ((now (get-internal-real-time)))
+  (let* ((now (get-internal-real-time))
+         (units-per-second #+64-bit-target 1000000
+                           #-64-bit-target 1000))
     (if (> now deadline)
       (error 'communication-deadline-expired :stream (ioblock-stream ioblock))
-      (values (round (- deadline now) (/ internal-time-units-per-second 1000))))))
+      (values (round (- deadline now) (/ units-per-second 1000))))))
 
 
 ;;; Note that we can get "bivalent" streams by specifiying :character-p t

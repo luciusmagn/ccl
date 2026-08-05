@@ -1,6 +1,7 @@
 ;;;-*- Mode: Lisp; Package: CCL -*-
 ;;;
 ;;; Copyright 2001-2014 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -678,7 +679,9 @@ the socket is not connected."))
 		    (cond
 		      (deadline
 		       (max (round (- deadline (get-internal-real-time))
-				   (/ internal-time-units-per-second 1000))
+				   (/ #+64-bit-target 1000000
+                                      #-64-bit-target 1000
+                                      1000))
 			    0))
 		      (connect-timeout
 		       (check-io-timeout connect-timeout)

@@ -1,4 +1,5 @@
 ;;; -*- Syntax: Common-Lisp; Base: 10 -*-
+;;; Copyright 2026 Lambda Symbolics OÜ
 
 (in-package #:ccl)
 
@@ -20,9 +21,11 @@
 
 (declaim (inline timestamp-string))
 (defun timestamp-string ()
-  (multiple-value-bind (secs us)
-      (floor (get-internal-real-time) internal-time-units-per-second)
-    (format nil "~6,'0D.~6,'0D: " secs us)))
+  (let* ((units-per-second #+64-bit-target 1000000
+                           #-64-bit-target 1000))
+    (multiple-value-bind (secs us)
+        (floor (get-internal-real-time) units-per-second)
+      (format nil "~6,'0D.~6,'0D: " secs us))))
 
 (defmethod stream-write-char ((ts timestamped-stream) char)
   (with-slots (stream last-char) ts

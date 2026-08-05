@@ -1,6 +1,7 @@
 ;;;-*- Mode: Lisp; Package: CCL -*-
 ;;;
 ;;; Copyright 1994-2009 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -132,7 +133,10 @@ atomically decremented."
   (or (%wait-on-semaphore-ptr semptr 0 0 notification)
       (with-process-whostate ("Semaphore timed wait")
         (let* ((now (get-internal-real-time))
-               (stop (+ now (floor (* duration internal-time-units-per-second)))))
+               (units-per-second #+64-bit-target 1000000
+                                 #-64-bit-target 1000)
+               (stop (+ now (floor (* duration
+                                      units-per-second)))))
           (multiple-value-bind (secs millis) (milliseconds duration)
             (loop
               (multiple-value-bind (success err)
@@ -146,9 +150,10 @@ atomically decremented."
                 (unless (zerop duration)
                   (let* ((diff (- stop now)))
                     (multiple-value-bind (remaining-seconds remaining-itus)
-                        (floor diff internal-time-units-per-second)
+                        (floor diff units-per-second)
                       (setq secs remaining-seconds
-                            millis (floor remaining-itus (/ internal-time-units-per-second 1000)))))))))))))
+                            millis (floor remaining-itus
+                                          (/ units-per-second 1000)))))))))))))
 
 (defun timed-wait-on-semaphore (s duration &optional notification)
   "Wait until the given semaphore has a positive count which can be
@@ -188,7 +193,10 @@ atomically decremented, or until a timeout expires."
               (error "Error waiting for signal ~d: ~a." s (%strerror err)))))
       (with-process-whostate ("signal wait")
         (let* ((now (get-internal-real-time))
-               (stop (+ now (floor (* duration internal-time-units-per-second)))))
+               (units-per-second #+64-bit-target 1000000
+                                 #-64-bit-target 1000)
+               (stop (+ now (floor (* duration
+                                      units-per-second)))))
           (multiple-value-bind (secs millis) (milliseconds duration)
             (loop
               (multiple-value-bind (success err)
@@ -204,9 +212,10 @@ atomically decremented, or until a timeout expires."
                 (unless (zerop duration)
                   (let* ((diff (- stop now)))
                     (multiple-value-bind (remaining-seconds remaining-itus)
-                        (floor diff internal-time-units-per-second)
+                        (floor diff units-per-second)
                       (setq secs remaining-seconds
-                            millis (floor remaining-itus (/ internal-time-units-per-second 1000)))))))))))))
+                            millis (floor remaining-itus
+                                          (/ units-per-second 1000)))))))))))))
   
 (defun %os-getcwd (buf noctets)
   ;; Return N < 0, if error
