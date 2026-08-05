@@ -1,6 +1,7 @@
 ;;;   -*- Mode: LISP; Syntax: Common-lisp; Package: (ANSI-LOOP "COMMON-LISP"); Base: 10; Lowercase:T -*-
 ;;;
 ;;; Copyright 1986-1992 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -322,6 +323,16 @@ constructed.
   operation)
 
 
+(defun loop-minimax-target-limit (limit)
+  (ecase limit
+    (most-positive-fixnum
+     (arch::target-most-positive-fixnum
+      (ccl::backend-target-arch ccl::*target-backend*)))
+    (most-negative-fixnum
+     (arch::target-most-negative-fixnum
+      (ccl::backend-target-arch ccl::*target-backend*)))))
+
+
 (defmacro with-minimax-value (lm &body body)
   (let ((init (loop-typed-init (loop-minimax-type lm)))
 	(which (car (loop-minimax-operations lm)))
@@ -331,13 +342,17 @@ constructed.
 	(flag-var (loop-minimax-flag-variable lm))
 	(type (loop-minimax-type lm)))
     (if flag-var
-	`(let ((,answer-var ,init) (,temp-var ,init) (,flag-var nil))
-	   (declare (type ,type ,answer-var ,temp-var))
-	   ,@body)
-	`(let ((,answer-var ,(if (eq which 'min) (first infinity-data) (second infinity-data)))
-	       (,temp-var ,init))
-	   (declare (type ,type ,answer-var ,temp-var))
-	   ,@body))))
+        `(let ((,answer-var ,init) (,temp-var ,init) (,flag-var nil))
+           (declare (type ,type ,answer-var ,temp-var))
+           ,@body)
+        `(let ((,answer-var
+                 ,(loop-minimax-target-limit
+                   (if (eq which 'min)
+                     (first infinity-data)
+                     (second infinity-data))))
+               (,temp-var ,init))
+           (declare (type ,type ,answer-var ,temp-var))
+           ,@body))))
 
 
 (defmacro loop-accumulate-minimax-value (lm operation form)

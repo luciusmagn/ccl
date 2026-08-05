@@ -1,6 +1,7 @@
 ; -*- Mode: Lisp; Package: CCL; -*-
 ;;;
 ;;; Copyright 1994-2009 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -347,7 +348,7 @@ nil;  otherwise return true.
 ; This table cannot be weak on key since hash tables are reaped before gcable-macptrs.
 (defvar *termination-functions-table* (make-hash-table :test 'eql))
 
-(defvar *terminable-macptr-max-id* most-negative-fixnum)
+(defvar *terminable-macptr-max-id* target::target-most-negative-fixnum)
 (defvar *free-terminable-macptr-ids* nil)
 
 (defun make-terminable-macptr (macptr termination-function &key master)

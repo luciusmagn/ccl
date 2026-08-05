@@ -1,6 +1,7 @@
 ;;;-*- Mode: Lisp; Package: CCL -*-
 ;;;
 ;;; Copyright 1994-2009 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -539,7 +540,10 @@
   (multiple-value-bind (body decls) (parse-body body env)
     (if (nx-form-typep (setq n (nx-transform n env)) 'fixnum env)
         (let* ((limit (gensym))
-               (upper (if (nx-form-constant-p n env) (nx-form-constant-value n env) most-positive-fixnum))
+               (upper (if (nx-form-constant-p n env)
+                        (nx-form-constant-value n env)
+                        (arch::target-most-positive-fixnum
+                         (backend-target-arch *target-backend*))))
                (top (gensym))
                (test (gensym)))
           `(let* ((,limit ,n) (,i 0))

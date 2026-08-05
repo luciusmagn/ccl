@@ -1,6 +1,7 @@
 ;;;-*-Mode: LISP; Package: CCL -*-
 ;;;
 ;;; Copyright 1994-2009 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -152,7 +153,8 @@
                      *cl-types*))
 |#
 
-(defconstant array-dimension-limit array-total-size-limit
+(defconstant array-dimension-limit
+  #.(expt 2 (- target::nbits-in-word target::num-subtag-bits))
   "the exclusive upper bound on any given dimension of an array")
 
 (defconstant most-positive-fixnum target::target-most-positive-fixnum

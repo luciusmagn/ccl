@@ -1,6 +1,7 @@
 ;;;-*-Mode: LISP; Package: CCL -*-
 ;;;
 ;;; Copyright 1994-2009 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -6717,7 +6718,10 @@
         (if (nx1-target-fixnump diff)
           (ppc2-use-operator (%nx1-operator fixnum) seg vreg xfer diff)
           (ppc2-use-operator (%nx1-operator immediate) seg vreg xfer diff))
-        (if (and v2 (neq v2 most-negative-fixnum))
+        (if (and v2
+                 (/= v2
+                     (arch::target-most-negative-fixnum
+                      (backend-target-arch *target-backend*))))
           (ppc2-fixnum-add seg vreg xfer num1 (make-acode (%nx1-operator fixnum) (- v2)) overflow) 
           (if (eq v2 0)
             (ppc2-form seg vreg xfer num1)

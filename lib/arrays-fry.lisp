@@ -1,6 +1,7 @@
 ; -*- Mode:Lisp; Package:CCL; -*-
 ;;;
 ;;; Copyright 1994-2009 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -299,7 +300,8 @@
 	    (if (and displaced-index-offset 
 		     (or (not (fixnump displaced-index-offset))
 			 (< displaced-index-offset 0)))
-	      (report-bad-arg displaced-index-offset '(integer 0 #.most-positive-fixnum)))
+	      (report-bad-arg displaced-index-offset
+                              '(integer 0 #.target::target-most-positive-fixnum)))
 	    (when (or initial-element-p initial-contents-p)
 	      (error "Cannot specify initial values for displaced arrays"))
 	    (unless (eq subtype (array-element-subtype displaced-to))
@@ -367,7 +369,9 @@
          (vector-p (eql typecode target::subtag-vectorH)))
     (unless (or array-p vector-p)
       (error "Array ~S cannot be displaced" array))
-    (unless (fixnump offset) (report-bad-arg offset '(integer 0 #.most-positive-fixnum)))
+    (unless (fixnump offset)
+      (report-bad-arg offset
+                      '(integer 0 #.target::target-most-positive-fixnum)))
     (unless (adjustable-array-p data)
       (multiple-value-bind (ndata noffset) (displaced-array-p data)
         (if ndata (setq data ndata offset (%i+ offset noffset)))))

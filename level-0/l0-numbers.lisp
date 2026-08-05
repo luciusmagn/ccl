@@ -1,6 +1,7 @@
 ;;; -*- Mode: Lisp; Package: CCL -*-
 ;;;
 ;;; Copyright 1994-2009 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -1824,7 +1825,7 @@
             (check-type integer integer)
             (if (plusp count)
               (error "Count ~s too large for ASH" count)
-              (%ash-right integer most-positive-fixnum)))))))
+              (%ash-right integer target::target-most-positive-fixnum)))))))
 
 (defun integer-length (integer)
   "Return the number of significant bits in the absolute value of integer."

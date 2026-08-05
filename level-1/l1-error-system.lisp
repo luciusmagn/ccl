@@ -1,6 +1,7 @@
 ;;;-*-Mode: LISP; Package: CCL -*-
 ;;;
 ;;; Copyright 1994-2009 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -208,7 +209,8 @@
                        typename
                        element-count
                        (copy-tree typename)
-                       (1- target::array-total-size-limit)
+                       (1- #.(expt 2 (- target::nbits-in-word
+                                        target::num-subtag-bits)))
                        qualifier)))))
 
 (define-condition type-error (error)

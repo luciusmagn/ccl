@@ -1,6 +1,7 @@
 ;;;-*-Mode: LISP; Package: CCL -*-
 ;;;
 ;;; Copyright 2010 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -29,7 +30,8 @@
 (idom-heap-utilization :unit nil :sort :size)
 |#
 
-(defconstant half-fixnum-shift (ash (integer-length most-positive-fixnum) -1))
+(defconstant half-fixnum-shift
+  #.(ash (integer-length target::target-most-positive-fixnum) -1))
 
 (defconstant half-fixnum-mask (1- (ash 1 half-fixnum-shift)))
 

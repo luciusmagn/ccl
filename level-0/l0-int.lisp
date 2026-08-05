@@ -1,6 +1,7 @@
 ;;;-*- Mode: Lisp; Package: CCL -*-
 ;;;
 ;;; Copyright 1994-2009 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -41,8 +42,8 @@
      (locally
 	 (declare (fixnum n))
        (if (minusp n)
-         (if (eql n most-negative-fixnum)
-           (- most-negative-fixnum)
+         (if (eql n target::target-most-negative-fixnum)
+           (- target::target-most-negative-fixnum)
            (the fixnum (- n)))
          n)))
     (bignum
