@@ -1,6 +1,7 @@
 ;;;-*- Mode: Lisp; Package: CCL -*-
 ;;;
 ;;; Copyright 2010 Clozure Associates
+;;; Copyright 2026 Lambda Symbolics OÜ
 ;;;
 ;;; Licensed under the Apache License, Version 2.0 (the "License");
 ;;; you may not use this file except in compliance with the License.
@@ -129,7 +130,7 @@
 
 
 (defarmlapfunction dfloat-significand-zeros ((dfloat arg_z))
-  (ldr imm1 (:@ dfloat (:$ arm::double-float.value)))
+  (ldr imm1 (:@ dfloat (:$ arm::double-float.val-high)))
   (movs imm1 (:lsl imm1 (:$ 12)))
   (clz imm1 imm1)
   (movne arg_z (:lsl imm1 (:$ arm::fixnumshift)))
