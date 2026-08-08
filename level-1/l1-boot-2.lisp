@@ -385,18 +385,17 @@ present and false otherwise. This variable shouldn't be set by user code.")
       (bin-load-provide "SWANK-LOADER" "swank-loader")
       (bin-load-provide "REMOTE-LISP" "remote-lisp")
       (bin-load-provide "MCL-COMPAT" "mcl-compat")
+      (require "LISPEQU")
       (require "LOOP")
       (bin-load-provide "CCL-EXPORT-SYMS" "ccl-export-syms")
       (l1-load-provide "VERSION" "version")
       (require "JP-ENCODE")
       (require "CN-ENCODE")
-      (require "LISPEQU") ; Shouldn't need this at load time ...
       (require "SOCKETS")
       )
     (setq *%fasload-verbose* nil)
     )
 )
-
 
 
 
