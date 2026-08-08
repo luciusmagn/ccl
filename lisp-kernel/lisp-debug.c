@@ -276,6 +276,12 @@ char* Iregnames[] = {"???", "rdi", "rsi", "rdx", "rcx", "r8 ", "r9 ", "rax",
                      "rbx", "rbp", "r10", "r11", "r12", "r13", "r14", "r15",
                      "???", "???", "???", "???", "???", "???", "???", "rsp"};
 #endif
+#ifdef NETBSD
+char* Iregnames[] = {"rdi", "rsi", "rdx", "rcx", "r8 ", "r9 ", "r10", "r11",
+                     "r12", "r13", "r14", "r15", "rbp", "rbx", "rax", "gs ",
+                     "fs ", "es ", "ds ", "trap", "err", "rip", "cs ", "rfl",
+                     "rsp", "ss "};
+#endif
 #ifdef DARWIN
 char* Iregnames[] = {"rax", "rbx", "rcx", "rdx", "rdi", "rsi",
                      "rbp", "rsp", "r8 ", "r9 ", "r10", "r11", "r12", "r13",
@@ -1178,6 +1184,9 @@ debug_show_fpu(ExceptionInformation *xp, siginfo_t *info, int arg)
 #ifdef FREEBSD
   struct xmmacc *xmmp = xpXMMregs(xp);
 #endif
+#ifdef NETBSD
+  struct xmmreg *xmmp = xpXMMregs(xp);
+#endif
 #ifdef SOLARIS
   upad128_t *xmmp = xpXMMregs(xp);
 #endif
@@ -1198,6 +1207,9 @@ debug_show_fpu(ExceptionInformation *xp, siginfo_t *info, int arg)
 #endif
 #ifdef FREEBSD
           (((struct savefpu *)(&(xp)->uc_mcontext.mc_fpstate))->sv_env.en_mxcsr)
+#endif
+#ifdef NETBSD
+          xpMXCSR(xp)
 #endif
 #ifdef SOLARIS
 	  xp->uc_mcontext.fpregs.fp_reg_set.fpchip_state.xstatus

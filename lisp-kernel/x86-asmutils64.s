@@ -163,6 +163,11 @@ _endfn
 /*   Not fully general, but should get us off of the signal stack */
         __ifndef(`WINDOWS')
 _exportfn(C(switch_to_foreign_stack))
+	__ifdef(`NETBSD')
+	 /* NetBSD's signal trampoline passes the ucontext to setcontext in
+	    %r15.  Point it at the copy on the foreign stack. */
+	 __(movq %r8,%r15)
+	__endif
 	__(movq %rdi,%rsp)
 	__(movq %rsi,%rax)
 	__(movq %rdx,%rdi)

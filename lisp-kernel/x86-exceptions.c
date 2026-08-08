@@ -905,7 +905,7 @@ is_write_fault(ExceptionInformation *xp, siginfo_t *info)
 #ifdef DARWIN
   return (UC_MCONTEXT(xp)->__es.__err & 0x2) != 0;
 #endif
-#if defined(LINUX) || defined(SOLARIS)
+#if defined(LINUX) || defined(NETBSD) || defined(SOLARIS)
   return (xpGPR(xp,REG_ERR) & 0x2) != 0;
 #endif
 #ifdef FREEBSD
@@ -1618,6 +1618,25 @@ copy_fpregs(ExceptionInformation *xp, LispObj *current, FPREGS *destptr)
 }
 #endif
 
+#if defined(NETBSD) && defined(_UC_XSAVE)
+LispObj *
+copy_netbsd_xstate(ExceptionInformation *xp, LispObj *current, void **destptr)
+{
+  natural sp;
+
+  *destptr = NULL;
+  if (AVX_CONTEXT_PRESENT(xp)) {
+    sp = (natural)current;
+    sp -= AVX_CONTEXT_SIZE(xp);
+    sp = truncate_to_power_of_2(sp,6);
+    memcpy((void *)sp, (void *)AVX_CONTEXT_PTR(xp), AVX_CONTEXT_SIZE(xp));
+    current = (LispObj *)sp;
+    *destptr = (void *)current;
+  }
+  return current;
+}
+#endif
+
 
 #ifdef FREEBSD
 typedef void *FPREGS;
@@ -1692,6 +1711,11 @@ copy_ucontext(ExceptionInformation *context, LispObj *current, copy_ucontext_las
 #ifdef FREEBSD
   if (AVX_CONTEXT_PRESENT(context)) {
     AVX_CONTEXT_PTR(context) = (natural)fp;
+  }
+#endif
+#if defined(NETBSD) && defined(_UC_XSAVE)
+  if (AVX_CONTEXT_PRESENT(context)) {
+    AVX_CONTEXT_PTR(dest) = (natural)fp;
   }
 #endif
   dest->uc_stack.ss_sp = 0;
@@ -1808,6 +1832,9 @@ handle_signal_on_foreign_stack(TCR *tcr,
 #endif
 #ifdef FREEBSD
   foreign_rsp = copy_avx(context, foreign_rsp, &fpregs);
+#endif
+#if defined(NETBSD) && defined(_UC_XSAVE)
+  foreign_rsp = copy_netbsd_xstate(context, foreign_rsp, &fpregs);
 #endif
 #ifdef DARWIN
   foreign_rsp = copy_darwin_mcontext(UC_MCONTEXT(context), foreign_rsp, &mcontextp);

@@ -39,7 +39,7 @@
 #define Iflags      REG_EFL
 #endif
 
-#if defined(SOLARIS) || defined(FREEBSD) || defined(DARWIN)
+#if defined(SOLARIS) || defined(FREEBSD) || defined(NETBSD) || defined(DARWIN)
 #define Iflags      REG_RFL
 #endif
 
