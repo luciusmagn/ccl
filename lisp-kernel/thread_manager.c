@@ -991,12 +991,23 @@ allocate_tcr()
 #ifdef FREEBSD
 #include <machine/sysarch.h>
 #endif
+#ifdef NETBSD
+#include <machine/sysarch.h>
+#endif
 
 void
 setup_tcr_extra_segment(TCR *tcr)
 {
 #ifdef FREEBSD
   amd64_set_gsbase(tcr);
+#endif
+#ifdef NETBSD
+  natural base = (natural)tcr;
+
+  if (sysarch(X86_64_SET_GSBASE, &base) != 0) {
+    perror("X86_64_SET_GSBASE");
+    exit(1);
+  }
 #endif
 #ifdef LINUX
   /*
