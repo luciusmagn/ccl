@@ -55,6 +55,17 @@ if [ -z "$OPENMCL_KERNEL" ]; then
       ;;
     esac
     ;;
+    NetBSD)
+    case `uname -m` in
+      amd64|x86_64)
+      OPENMCL_KERNEL=nx86cl64
+      ;;
+      *)
+      echo "unsupported architecture"
+      exit 1
+      ;;
+    esac
+    ;;
     SunOS)
     case `uname -m` in
       i86pc)

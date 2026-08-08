@@ -40,6 +40,7 @@ if [ -z "$OPENMCL_KERNEL" ]; then
     ;;
     NetBSD) case `uname -p` in
               earmv7*) OPENMCL_KERNEL=narmcl ;;
+              amd64|x86_64) OPENMCL_KERNEL=nx86cl64 ;;
               *)
               echo "Unsupported NetBSD architecture."
               exit 1

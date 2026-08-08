@@ -92,6 +92,9 @@
     #+linuxarm-target :linuxarm-host
     #+netbsdarm-target :netbsdarm-target
     #+netbsdarm-target :netbsdarm-host
+    #+netbsdx86-target :netbsdx86-target
+    #+netbsdx8664-target :netbsdx8664-target
+    #+netbsdx8664-target :netbsdx8664-host
     #+darwinarm-target :darwinarm-target
     #+darwinarm-target :darwinarm-host
     #+darwinppc-target :darwinppc-target

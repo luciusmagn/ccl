@@ -83,6 +83,38 @@
       15                                ;r15
       )))
 
+#+netbsdx8664-target
+(progn
+  (defconstant gp-regs-offset
+    (get-field-offset :ucontext_t.uc_mcontext.__gregs))
+  (defconstant fxsave-offset
+    (get-field-offset :ucontext_t.uc_mcontext.__fpregs))
+  (defmacro xp-gp-regs (xp) xp)
+  (defconstant flags-register-offset 23)
+  (defconstant rip-register-offset 21)
+  (defun xp-mxcsr (xp)
+    (%get-unsigned-long xp (+ fxsave-offset 24)))
+  (defmacro xp-xmm-regs (xp)
+    `(%inc-ptr ,xp ,(+ fxsave-offset 160)))
+  (defparameter *encoded-gpr-to-indexed-gpr*
+    #(14                                ;rax
+      3                                 ;rcx
+      2                                 ;rdx
+      13                                ;rbx
+      24                                ;rsp
+      12                                ;rbp
+      1                                 ;rsi
+      0                                 ;rdi
+      4                                 ;r8
+      5                                 ;r9
+      6                                 ;r10
+      7                                 ;r11
+      8                                 ;r12
+      9                                 ;r13
+      10                                ;r14
+      11                                ;r15
+      )))
+
 #+darwinx8664-target
 (progn
   (defconstant gp-regs-offset 0)
