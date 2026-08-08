@@ -80,6 +80,11 @@
 	(item ".nafsl")
 	(item "netbsdarm"))
       (row
+	(item "NetBSD (x86-64, experimental)")
+	(item "nx86cl64")
+	(item ".nx64fsl")
+	(item "netbsdx8664"))
+      (row
 	(item "OS X (x8664)")
 	(item "dx86cl64")
 	(item ".dx64fsl")
@@ -142,10 +147,10 @@ build process uses {system m4};  this program is often not installed by default,
 make sure you have it.  The lisp kernel makefiles generally assume that you are using
 GNU make.
 
-    The experimental NetBSD/earmv7hf kernel is an exception: its Makefile requires
-BSD make.  On NetBSD, invoke the base system's {system /usr/bin/make}; on systems where
-BSD make is installed separately, invoke it as {system bmake}.  The build also requires
-{system /usr/sbin/paxctl}, which the Makefile runs on the resulting kernel.
+    The experimental NetBSD kernels are exceptions: their Makefiles require BSD
+make.  On NetBSD, invoke the base system's {system /usr/bin/make}; on systems where
+BSD make is installed separately, invoke it as {system bmake}.  The builds also
+require {system /usr/sbin/paxctl}, which the Makefiles run on the resulting kernels.
 
     On a recent Mac OS X system, typing {system xcode-select --install} should download
 and install everything needed to build {CCL}.")
@@ -215,6 +220,15 @@ $ /usr/bin/make")
     "This writes {system ccl/narmcl}.  The final build step runs {system
 /usr/sbin/paxctl +m +a ../../narmcl}; do not omit that step when copying
 the link command into another build system.")
+
+    "The experimental NetBSD/x86-64 kernel is built natively in the same way:"
+
+    (code-block "$ cd ccl/lisp-kernel/netbsdx8664
+$ /usr/bin/make clean
+$ /usr/bin/make")
+
+    "This writes {system ccl/nx86cl64}.  Its final build step runs {system
+/usr/sbin/paxctl +m +a ../../nx86cl64}."
 
   (defsection "Building the Heap Image"
     "Typically, {function rebuild-ccl} is used to rebuild all of {CCL}.
@@ -382,5 +396,72 @@ $ ./narmcl --image-name narm-boot --no-init")
        float integer)} path does not consult the accumulated FPSCR
        exception flags, so the failure is shared with the Linux ARM32
        port rather than specific to NetBSD.")
+
+    (defsection "Experimental NetBSD/x86-64 bootstrap"
+      "The NetBSD/x86-64 cross-compilation backend is named {code
+       :netbsdx8664}.  It writes {code .nx64fsl} files and names its
+       bootstrapping image {system nx86-boot64}.  A cross-build host
+       needs a working CCL 1.13 image, its matching host interface
+       database, and the generated {system netbsd-x86-headers64/libc}
+       database in the checkout.  Start the host CCL with {system
+       --no-init}, then direct it at the checkout:"
+
+      (code-block "? (ccl::set-ccl-directory #p\"/path/to/ccl/\")")
+
+      "If the matching host interface database is outside the checkout,
+       add a logical-pathname translation for it.  For example, an
+       x86-64 Linux host whose database is under {system /usr/lib/ccl}
+       uses:"
+
+      (code-block "? (push (list #p\"ccl:x86-headers64;**;*.*\"
+                    #p\"/usr/lib/ccl/x86-headers64/**/*.*\")
+              (logical-pathname-translations \"ccl\"))")
+
+      "Load the shared definitions, the x86-64 compiler and
+       cross-dumper, the target foreign interface, and the current
+       LOOP macros.  The NetBSD backend uses the same x86 LAP macros as
+       the host backend, so share that table before compiling:"
+
+      (code-block "? (ccl::update-modules ccl::*sysdef-modules* t)
+? (ccl::update-modules '(ccl::backend ccl::nx) t)
+? (ccl::require-update-modules ccl::*x86-compiler-modules* t)
+? (ccl::require-update-modules ccl::*x8664-compiler-backend-modules* t)
+? (ccl::require-update-modules ccl::*x86-compiler-backend-modules* t)
+? (ccl::require-update-modules ccl::*x86-xdev-modules* t)
+? (ccl::require-update-modules ccl::*x8664-xload-modules* t)
+? (ccl::require-update-modules 'ccl::db-io t)
+? (let ((backend (ccl::find-backend :netbsdx8664)))
+    (setf (ccl::backend-lap-macros backend)
+          (ccl::backend-lap-macros ccl::*host-backend*))
+    (ccl::setup-x8664-ftd backend))
+? (ccl::require-update-modules 'ccl::ffi-netbsdx8664 t)
+? (ccl::require-update-modules 'ccl::loop t)
+? (ccl::cross-compile-ccl :netbsdx8664 t)
+? (ccl::cross-xload-level-0 :netbsdx8664 :force)")
+
+      "This writes {system nx86-boot64} and the target {code .nx64fsl}
+       files in the repository.  Move the complete tree to the NetBSD
+       target, build {system nx86cl64}, and start the cold load:"
+
+      (code-block "$ cd ccl/lisp-kernel/netbsdx8664
+$ /usr/bin/make clean
+$ /usr/bin/make
+$ cd ../..
+$ ./nx86cl64 --image-name nx86-boot64 --no-init")
+
+      "When the cold load reaches the listener, save the complete image:"
+
+      (code-block "? (ccl:save-application \"nx86cl64.image\")")
+
+      "Cross-compilation on a Linux/x86-64 host, cold-loading and saving
+       the image, restarting it, and a subsequent full native
+       {function rebuild-ccl} have been exercised on NetBSD 11.0/amd64.
+       The resulting Lisp passes all 21,923 tests in the {system
+       ccl-tests} suite.
+
+       The kernel build runs the C compiler, which writes its temporary
+       files to {system /tmp}.  If the target mounts {system /tmp} as a
+       small tmpfs, set {system TMPDIR} to a directory on disk before
+       building the kernel or rebuilding CCL.")
 
   ) ;chapter

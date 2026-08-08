@@ -694,6 +694,8 @@ macptr to the block.")
         (row (item "Linux ARM") (item "{code arm-headers}"))
         (row (item "NetBSD ARM (earmv7hf, experimental)")
              (item "{code netbsd-arm-headers}"))
+        (row (item "NetBSD x86-64 (experimental)")
+             (item "{code netbsd-x86-headers64}"))
         (row (item "Darwin (macOS) x86-64")
              (item "{code darwin-x86-headers64}"))
         (row (item "FreeBSD x86") (item "{code freebsd-headers}"))
@@ -710,6 +712,11 @@ macptr to the block.")
              when both targets use the ARM EABI.  Install the generated
              directory at the top level of the CCL tree, as with the interface
              databases for other targets.")
+
+      (para "The experimental NetBSD/x86-64 port similarly expects interfaces
+             generated from the target NetBSD/amd64 headers in {code
+             netbsd-x86-headers64}.  A FreeBSD or Linux x86-64 database is not
+             a substitute.")
 
        "CCL defines reader macros that consult these databases:"
 
@@ -857,6 +864,33 @@ $ FFIGEN=/path/to/ffigen5 \\
       "The second pass resolves constants which may have been forward
        references during the first pass.  The resulting database files
        belong directly in {system netbsd-arm-headers/libc/} in the CCL
+       tree.  Interface databases are binary-distribution artifacts and
+       are not stored in the CCL source repository.")
+
+    (defsection "Generating NetBSD/x86-64 interfaces"
+      "The companion {system ccl-ffigen} change for this port adds
+       {system netbsd-x86-headers64/libc/C/translate.sh}.  To translate
+       headers on another system, provide a host {system ffigen5}, a
+       NetBSD sysroot, and the target triple:"
+
+      (code-block "$ cd ccl-ffigen/netbsd-x86-headers64/libc/C
+$ FFIGEN=/path/to/ffigen5 \\
+    SYSROOT=/path/to/netbsd-sysroot \\
+    TARGET=x86_64-unknown-netbsd \\
+    sh translate.sh")
+
+      "When {system ffigen5} runs natively on NetBSD/amd64, omit {code
+       SYSROOT} and {code TARGET}.  After loading the {code
+       :netbsdx8664} compiler backend into the host CCL, parse the
+       generated files twice:"
+
+      (code-block "? (require 'parse-ffi)
+? (ccl::parse-standard-ffi-files :libc :netbsdx8664)
+? (ccl::parse-standard-ffi-files :libc :netbsdx8664)")
+
+      "The second pass resolves constants which may have been forward
+       references during the first pass.  The resulting database files
+       belong directly in {system netbsd-x86-headers64/libc/} in the CCL
        tree.  Interface databases are binary-distribution artifacts and
        are not stored in the CCL source repository.")
 
