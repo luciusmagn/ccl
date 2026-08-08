@@ -86,9 +86,11 @@
 #+netbsdx8664-target
 (progn
   (defconstant gp-regs-offset
-    (get-field-offset :ucontext_t.uc_mcontext.__gregs))
+    (+ (get-field-offset :ucontext_t.uc_mcontext)
+       (get-field-offset :mcontext_t.__gregs)))
   (defconstant fxsave-offset
-    (get-field-offset :ucontext_t.uc_mcontext.__fpregs))
+    (+ (get-field-offset :ucontext_t.uc_mcontext)
+       (get-field-offset :mcontext_t.__fpregs)))
   (defmacro xp-gp-regs (xp) xp)
   (defconstant flags-register-offset 23)
   (defconstant rip-register-offset 21)
