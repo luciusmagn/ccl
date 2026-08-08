@@ -72,7 +72,11 @@ ifdef(`NETBSD',`define(`SYSstabs',`ELFstabs')
 	       define(`MacroLabelPrefix',`.L__')
 	       define(`StartTextLabel',`.Ltext0')
 	       define(`EndTextLabel',`.Letext')
+	       ifdef(`ARM',`
 	       define(`EABI',`')')
+	       ifdef(`X86',`
+	       define(`SYSCALL_SETS_CARRY_ON_ERROR',`')')
+')
 
 ifdef(`SOLARIS',`define(`SYSstabs',`ELFstabs')
 	       define(`HaveWeakSymbols',`')
@@ -377,10 +381,11 @@ undefine(`USE_POWEROPEN_C_FRAME')
 ')')
 
 ifdef(`NETBSD',`
+ifdef(`ARM',`
 define(`USE_EABI_C_FRAME',`')
 undefine(`USE_POWEROPEN_C_FRAME')
 ')
-
+')
 
 
 
