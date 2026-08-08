@@ -59,7 +59,7 @@ struct timespec {
 #endif
 #endif
 
-#if defined(NETBSD) && defined(ARM)
+#ifdef NETBSD
 /*
  * NetBSD unnamed POSIX semaphores consume a process file descriptor.
  * CCL creates a semaphore for each lock, so use process-private futexes.
