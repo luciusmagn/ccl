@@ -757,7 +757,7 @@
     #+arm-target (%set-fpscr-status 0)
     (%setf-double-float TEMP (#_exp n))
     (%df-check-exception-1 'exp n (%ffi-exception-status))
-    #+(or linux-target freebsdx8632-target)
+    #+(or linux-target freebsdx8632-target netbsdx8664-target)
     (and (infinity-p TEMP)
          (not (infinity-p n))
          (get-fpu-mode :overflow)
@@ -795,7 +795,7 @@
   (declare (single-float n))
   (let* ((result (#_expf n)))
     (%sf-check-exception-1 'exp n (%ffi-exception-status))
-    #+linux-target
+    #+(or linux-target netbsdx8664-target)
     (and (infinity-p result)
          (not (infinity-p n))
          (get-fpu-mode :overflow)
