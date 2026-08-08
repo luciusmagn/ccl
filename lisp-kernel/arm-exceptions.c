@@ -1684,19 +1684,35 @@ alloc_instruction_id  classify_alloc_instruction (ExceptionInformation *xp)
   
 
 void
-restart_allocation(ExceptionInformation *xp)
+restart_allocation(ExceptionInformation *xp, Boolean restore_allocptr)
 {
   pc p = xpPC(xp);
   opcode instr = *p;
 
+  /* The instruction at the PC has not executed yet. */
+  if (IS_SUB_RM_FROM_ALLOCPTR(instr) ||
+      IS_SUB_LO_FROM_ALLOCPTR(instr)) {
+    return;
+  }
+
   while (1) {
-    if (IS_SUB_RM_FROM_ALLOCPTR(instr) ||
-        IS_SUB_LO_FROM_ALLOCPTR(instr)) {
+    --p;
+    instr = *p;
+    if (IS_SUB_RM_FROM_ALLOCPTR(instr)) {
+      if (restore_allocptr) {
+        xpGPR(xp,allocptr) += xpGPR(xp,RM_field(instr));
+      }
       xpPC(xp) = p;
       return;
-    } else {
-      --p;
-      instr = *p;
+    }
+    if (IS_SUB_FROM_ALLOCPTR(instr)) {
+      if (restore_allocptr) {
+        xpGPR(xp,allocptr) += ror(instr & 0xff, (instr & 0xf00) >> 7);
+      }
+      if (IS_SUB_LO_FROM_ALLOCPTR(instr)) {
+        xpPC(xp) = p;
+        return;
+      }
     }
   }
 }
@@ -1814,9 +1830,14 @@ pc_luser_xp(ExceptionInformation *xp, TCR *tcr, signed_natural *alloc_disp)
           }
         }
       } else {
-        restart_allocation(xp);
+        restart_allocation(xp, alloc_disp != NULL);
       }
-      xpGPR(xp,allocptr) = VOID_ALLOCPTR;
+      /* A current-thread interrupt can immediately call back into Lisp.
+         Preserve the valid allocation pointer left by finishing or
+         restarting the interrupted allocation. */
+      if (alloc_disp == NULL) {
+        xpGPR(xp,allocptr) = VOID_ALLOCPTR;
+      }
 #if 0
       if (state == 1777 + ID_alloc_trap_instruction) {
         /* what a tangled web we weave */
