@@ -96,6 +96,7 @@
                         (:linuxx8664 "ccl:x86-headers64;")
                         (:darwinx8664 "ccl:darwin-x86-headers64;")
                         (:freebsdx8664 "ccl:freebsd-headers64;")
+                        (:netbsdx8664 "ccl:netbsd-x86-headers64;")
                         (:solarisx8664 "ccl:solarisx64-headers;")
                         (:win64 "ccl:win64-headers;")
                         (:linuxx8632 "ccl:x86-headers;")

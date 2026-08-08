@@ -119,6 +119,35 @@
                 :lisp-context-register x8664::gs
                 ))
 
+(defvar *netbsdx8664-backend*
+  (make-backend :lookup-opcode 'lookup-x86-opcode
+		:lookup-macro #'false
+                :lap-opcodes x86::*x86-opcode-templates*
+                :define-vinsn 'define-x86-vinsn
+		:p2-dispatch *x862-specials*
+		:p2-vinsn-templates *x8664-vinsn-templates*
+		:p2-template-hash-name '*x8664-vinsn-templates*
+		:p2-compile 'x862-compile
+		:target-specific-features
+		'(:x8664 :x86-target :netbsd-target :netbsdx86-target
+                  :x8664-target :netbsdx8664-target
+                  :little-endian-target
+                  :64-bit-target)
+		:target-fasl-pathname (make-pathname :type "nx64fsl")
+		:target-platform (logior platform-cpu-x86
+                                         platform-os-netbsd
+                                         platform-word-size-64)
+		:target-os :netbsdx86
+		:name :netbsdx8664
+		:target-arch-name :x8664
+		:target-foreign-type-data nil
+                :target-arch x8664::*x8664-target-arch*
+                :platform-syscall-mask (logior platform-os-netbsd
+                                               platform-cpu-x86
+                                               platform-word-size-64)
+                :lisp-context-register x8664::gs
+                ))
+
 #+solarisx86-target
 (defvar *solarisx8664-backend*
   (make-backend :lookup-opcode 'lookup-x86-opcode
@@ -175,6 +204,8 @@
                 :platform-syscall-mask (logior platform-os-windows platform-cpu-x86 platform-word-size-64)
                 :lisp-context-register x8664::r11
                 ))
+
+(pushnew *netbsdx8664-backend* *known-x8664-backends* :key #'backend-name)
 
 #+(or linuxx86-target (not x86-target))
 (pushnew *linuxx8664-backend* *known-x8664-backends* :key #'backend-name)
@@ -267,6 +298,25 @@
                            (intern "GENERATE-CALLBACK-BINDINGS" "X86-FREEBSD64")
                            :callback-return-value-function
                            (intern "GENERATE-CALLBACK-RETURN-VALUE" "X86-FREEBSD64")))
+                (:netbsdx8664
+                 (let* ((package-name "X86-NETBSD64"))
+                   (or (find-package package-name)
+                       (make-package package-name :use '("COMMON-LISP")))
+                   (make-ftd :interface-db-directory
+                             "ccl:netbsd-x86-headers64;"
+                             :interface-package-name package-name
+                             :attributes '(:bits-per-word 64
+                                           :struct-by-value t)
+                             :ff-call-expand-function
+                             (intern "EXPAND-FF-CALL" package-name)
+                             :ff-call-struct-return-by-implicit-arg-function
+                             (intern "RECORD-TYPE-RETURNS-STRUCTURE-AS-FIRST-ARG"
+                                     package-name)
+                             :callback-bindings-function
+                             (intern "GENERATE-CALLBACK-BINDINGS" package-name)
+                             :callback-return-value-function
+                             (intern "GENERATE-CALLBACK-RETURN-VALUE"
+                                     package-name))))
                 (:solarisx8664
                  (make-ftd :interface-db-directory
                            (if (eq backend *host-backend*)
@@ -309,6 +359,7 @@
 #-x8664-target
 (setup-x8664-ftd *x8664-backend*)
 
+(pushnew *netbsdx8664-backend* *known-backends* :key #'backend-name)
 (pushnew *x8664-backend* *known-backends* :key #'backend-name)
 
 ;;; FFI stuff.  Seems to be shared by Darwin/Linux/FreeBSD.

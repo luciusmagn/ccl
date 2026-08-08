@@ -155,6 +155,7 @@
     (ffi-linuxx8664   "ccl:bin;ffi-linuxx8664"   ("ccl:lib;ffi-linuxx8664.lisp"))
     (ffi-darwinx8664  "ccl:bin;ffi-darwinx8664"  ("ccl:lib;ffi-darwinx8664.lisp"))
     (ffi-freebsdx8664 "ccl:bin;ffi-freebsdx8664" ("ccl:lib;ffi-freebsdx8664.lisp"))
+    (ffi-netbsdx8664  "ccl:bin;ffi-netbsdx8664"  ("ccl:lib;ffi-netbsdx8664.lisp"))
     (ffi-solarisx8664 "ccl:bin;ffi-solarisx8664" ("ccl:lib;ffi-solarisx8664.lisp"))
     (ffi-win64 "ccl:bin;ffi-win64" ("ccl:lib;ffi-win64.lisp"))
     (ffi-linuxx8632  "ccl:bin;ffi-linuxx8632" ("ccl:lib;ffi-linuxx8632.lisp"))

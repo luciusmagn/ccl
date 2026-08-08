@@ -171,6 +171,7 @@
              (:linuxx8664 'ffi-linuxx8664)
              (:darwinx8664 'ffi-darwinx8664)
              (:freebsdx8664 'ffi-freebsdx8664)
+             (:netbsdx8664 'ffi-netbsdx8664)
              (:solarisx8664 'ffi-solarisx8664)
              (:win64 'ffi-win64)
              (:linuxx8632 'ffi-linuxx8632)
@@ -274,7 +275,7 @@
 	    ((:linuxppc32 :darwinppc32 :linuxppc64 :darwinppc64)
 	     '(ppc-error-signal ppc-trap-support
 	       ppc-threads-utils ppc-callback-support))            
-            ((:linuxx8664 :freebsdx8664 :darwinx8664 :solarisx8664
+            ((:linuxx8664 :freebsdx8664 :netbsdx8664 :darwinx8664 :solarisx8664
                           :darwinx8632 :win64  :linuxx8632 :win32 :solarisx8632
                           :freebsdx8632)
              '(x86-error-signal x86-trap-support
@@ -480,6 +481,7 @@
     (:darwinx8632 "x86-boot32.image")
     (:linuxx8664 "x86-boot64")
     (:freebsdx8664 "fx86-boot64")
+    (:netbsdx8664 "nx86-boot64")
     (:darwinx8664 "x86-boot64.image")
     (:solarisx8664 "sx86-boot64")
     (:win64 "wx86-boot64.image")
@@ -500,6 +502,7 @@
     (:linuxppc64 "ppccl64")
     (:linuxx8664 "lx86cl64")
     (:freebsdx8664 "fx86cl64")
+    (:netbsdx8664 "nx86cl64")
     (:darwinx8664 "dx86cl64")
     (:solarisx8664 "sx86cl64")
     (:win64 "wx86cl64.exe")
@@ -524,6 +527,7 @@
     (:darwinx8632 "darwinx8632")
     (:linuxx8664 "linuxx8664")
     (:freebsdx8664 "freebsdx8664")
+    (:netbsdx8664 "netbsdx8664")
     (:darwinx8664 "darwinx8664")
     (:solarisx8664 "solarisx64")
     (:win64 "win64")
